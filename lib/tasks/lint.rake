@@ -4,8 +4,6 @@ begin
   require 'rubocop/rake_task'
   require 'haml_lint/rake_task'
 
-  HamlLint::RakeTask.new
-
   namespace :lint do
     desc 'Run security lint checks with Brakeman'
     task :security do
@@ -38,7 +36,7 @@ begin
     lint:js
     lint:css
   ]
-rescue LoadError => error.message
+rescue LoadError => error
   task :lint do
     puts "Skipping lint checks: #{error.message}"
   end
