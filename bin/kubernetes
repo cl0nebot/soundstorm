@@ -1,0 +1,63 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Kubernetes scripts
+
+require 'fileutils'
+include FileUtils
+
+APP_ROOT = File.expand_path('..', __dir__)
+SECRETS_FILE = Pathname.new("#{APP_ROOT}/config/kubernetes/secrets.yml")
+
+def system!(*args)
+  system(*args) || abort("\n== Command #{args} failed ==")
+end
+
+chdir APP_ROOT do
+  unless SECRETS_FILE.exist?
+    puts "\n== Configuring secrets from environment... =="
+    data = %w(
+      secret-key-base
+      database-url
+      redis-url
+      elasticsearch-url
+      host
+      cdn-url
+      aws-access-key
+      aws-s3-bucket
+      aws-region
+      sendgrid-username
+      sendgrid-password
+    ).each_with_object({}) do |secret, hash|
+      puts "#{secret}:"
+      raw = gets
+      encoded = Base64.encode64(raw)
+
+      hash[secret] = encoded
+    end
+
+    secrets = {
+      apiVersion: 'v1',
+      kind: 'Secret',
+      metadata: {
+        name: 'soundstorm-environment',
+      },
+      type: 'Opaque',
+      data: data
+    }
+
+    SECRETS_FILE.write(secrets.to_yaml)
+
+    abort "\n== Error creating secrets ==" unless SECRETS_FILE.exist?
+  end
+
+  puts "\n== Provisioning cluster... =="
+  system!(
+    %(
+      kubectl create -f config/kubernetes/secrets.yml &&
+      kubectl create -f config/kubernetes/deployment.yml &&
+      kubectl create -f config/kubernetes/service.yml &&
+      kubectl get deployments,pods
+    )
+  )
+end

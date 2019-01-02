@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: soundstorm-setup
+spec:
+  template:
+    spec:
+      backoffLimit: 4
+      restartPolicy: Never
+      containers:
+        - name: soundstorm-db-setup
+          image: weathermen/soundstorm
+          command: ["./bin/rails", "tmp:clear log:clear db:update"]
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: redis-url
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: secret-key-base
+            - name: ELASTICSEARCH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: elasticsearch-url
+            - name: SOUNDSTORM_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: host
+            - name: SOUNDSTORM_ADMIN_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: admin-user
+            - name: SOUNDSTORM_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: admin-user

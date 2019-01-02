@@ -24,6 +24,7 @@ services:
     build: .
     ports:
       - "${RAILS_PORT}:3000"
+    entrypoint: ./bin/entrypoint.sh
     links:
       - mailcatcher
     volumes:

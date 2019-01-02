@@ -1,0 +1,79 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: soundstorm-webapp
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: soundstorm
+    spec:
+      containers:
+        - name: soundstorm
+          image: weathermen/soundstorm:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: redis-url
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: secret-key-base
+            - name: SOUNDSTORM_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: host
+            - name: SOUNDSTORM_CDN_URL
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: cdn-url
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: aws-access-key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: aws-secret-key
+            - name: AWS_S3_BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: aws-s3-bucket
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: aws-region
+            - name: SMTP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: sendgrid-username
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: sendgrid-password
+            - name: ELASTICSEARCH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: soundstorm-environment
+                  key: elasticsearch-url
+            - name: RAILS_LOG_TO_STDOUT
+              value: 'true'

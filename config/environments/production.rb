@@ -101,4 +101,11 @@ Rails.application.configure do
     authentication: Soundstorm::SMTP_AUTH,
     enable_starttls_auto: Soundstorm::SMTP_TLS
   }
+
+  # Print Soundstorm logs to STDOUT in production
+  if Soundstorm::LOG_TO_STDOUT
+    logger           = ActiveSupport::Logger.new(STDOUT)
+    logger.formatter = config.log_formatter
+    config.logger    = ActiveSupport::TaggedLogging.new(logger)
+  end
 end

@@ -38,3 +38,5 @@ task-execution-assume-role.json
 
 # test coverage
 coverage
+
+config/kubernetes/secrets.yml

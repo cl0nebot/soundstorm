@@ -34,6 +34,3 @@ COPY . $APP_PATH
 
 # Install application dependencies and precompile assets in production.
 RUN ./bin/build
-
-# Precompile assets in production, install dependencies in development
-ENTRYPOINT ["sh", "bash ./bin/entrypoint.sh"]
