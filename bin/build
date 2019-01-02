@@ -18,10 +18,16 @@ def system!(*args)
   system(*args) || abort("\n== Command #{args} failed ==")
 end
 
+other_envs = %w(development test production)
+              .tap { |arr| arr.delete(RAILS_ENV) }
+              .join(' ')
+
 chdir APP_ROOT do
   puts '== Installing dependencies =='
   system! 'gem install bundler --conservative'
-  system('bundle check') || system!("bundle install --path #{BUNDLE_PATH}")
+  system('bundle check') || system!(
+    "bundle install --path #{BUNDLE_PATH} --without #{other_envs}"
+  )
   system! "bin/yarn --module-path=#{YARN_MODULE_PATH}"
 
   if RAILS_ENV == 'production'
